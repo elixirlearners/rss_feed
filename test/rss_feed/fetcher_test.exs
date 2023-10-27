@@ -1,6 +1,5 @@
 defmodule RssFeed.FetcherTest do
   use ExUnit.Case
-  doctest RssFeed.Fetcher
 
   defmodule MockHTTPoison do
     def get("http://example.com") do
