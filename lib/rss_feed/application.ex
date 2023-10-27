@@ -17,9 +17,9 @@ defmodule RssFeed.Application do
       # Start Finch
       {Finch, name: RssFeed.Finch},
       # Start the Endpoint (http/https)
-      RssFeedWeb.Endpoint
+      RssFeedWeb.Endpoint,
       # Start a worker by calling: RssFeed.Worker.start_link(arg)
-      # {RssFeed.Worker, arg}
+      RssFeed.ScheduledUpdate
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
