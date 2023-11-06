@@ -5,8 +5,10 @@ defmodule RssFeed.Feeds do
 
   import Ecto.Query, warn: false
   alias RssFeed.Repo
-
   alias RssFeed.Feeds.Feed
+
+  # 1 hour in seconds
+  @time_limit 60 * 60
 
   @doc """
   Returns the list of feeds.
@@ -19,6 +21,24 @@ defmodule RssFeed.Feeds do
   """
   def list_feeds do
     Repo.all(Feed)
+  end
+
+  def list_all_due_for_update do
+    {:ok, now} = DateTime.now("Etc/UTC")
+    overdue = DateTime.add(now, -@time_limit)
+
+    from(
+      f in Feed,
+      where: f.updated_at < ^overdue,
+      select: f
+    )
+    |> Repo.all()
+  end
+
+  def update_cache_metadata(%Feed{} = feed, attrs) do
+    feed
+    |> Feed.changeset_update_metadata(attrs)
+    |> Repo.update()
   end
 
   @doc """

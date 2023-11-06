@@ -65,6 +65,9 @@ config :rss_feed, RssFeedWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :rss_feed, dev_routes: true
 
+# In test we dont run the real scheduler
+config :rss_feed, :scheduler, RssFeed.FeedFetcher.ScheduledUpdate
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

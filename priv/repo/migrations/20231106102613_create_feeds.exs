@@ -6,7 +6,7 @@ defmodule RssFeed.Repo.Migrations.CreateFeeds do
       add :id, :binary_id, primary_key: true
       add :url, :string
       add :etag, :string
-      add :last_updated, :utc_datetime
+      add :last_modified, :string
 
       timestamps()
     end

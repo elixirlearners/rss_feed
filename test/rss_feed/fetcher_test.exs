@@ -75,9 +75,12 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
     end
   end
 
-  test "Receives an xml response" do
-    parent_pid = self()
-    Worker.run("http://example.com", parent_pid, MockHTTPoison)
+  setup do
+    [parent_pid: self()]
+  end
+
+  test "Receives an xml response", context do
+    Worker.run("http://example.com", context[:parent_pid], MockHTTPoison)
 
     assert_received {:ok,
                      %{
@@ -87,21 +90,18 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
                      }}
   end
 
-  test "malformed response results in :error" do
-    parent_pid = self()
-    Worker.run("http://malformed.com", parent_pid, MockHTTPoison)
+  test "malformed response results in :error", context do
+    Worker.run("http://malformed.com", context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://malformed.com"}
   end
 
-  test "404 results in :error" do
-    parent_pid = self()
-    Worker.run("http://404.com", parent_pid, MockHTTPoison)
+  test "404 results in :error", context do
+    Worker.run("http://404.com", context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://404.com"}
   end
 
-  test "Error results in :error" do
-    parent_pid = self()
-    Worker.run("http://error.com", parent_pid, MockHTTPoison)
+  test "Error results in :error", context do
+    Worker.run("http://error.com", context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://error.com"}
   end
 end

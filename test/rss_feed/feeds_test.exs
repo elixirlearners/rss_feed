@@ -8,7 +8,7 @@ defmodule RssFeed.FeedsTest do
 
     import RssFeed.FeedsFixtures
 
-    @invalid_attrs %{url: nil, etag: nil, last_updated: nil}
+    @invalid_attrs %{url: nil, etag: nil, last_modified: nil}
 
     test "list_feeds/0 returns all feeds" do
       feed = feed_fixture()

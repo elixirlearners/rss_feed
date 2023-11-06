@@ -1,19 +1,28 @@
 defmodule RssFeed.FeedFetcher.Worker do
-  def run(url, parent_pid, http_client \\ HTTPoison) do
+  def run(%RssFeed.Feeds.Feed{url: url}, parent_pid, http_client \\ HTTPoison) do
     result =
       url
       |> http_client.get()
       |> parse()
 
     case result do
-      {:ok, feed} -> send(parent_pid, {:ok, feed})
+      {:ok, feed, metadata} -> send(parent_pid, {:ok, feed, metadata})
       _ -> send(parent_pid, {:error, url})
     end
   end
 
-  def parse({:ok, %HTTPoison.Response{body: body, status_code: 200, headers: _headers}}) do
+  def parse({:ok, %HTTPoison.Response{body: body, status_code: 200, headers: headers}}) do
+    IO.inspect(headers)
+
+    enum_headers = Enum.into(headers, %{})
+
+    metadata = %{
+      etag: enum_headers["ETag"],
+      last_modified: enum_headers["Last-Modified"]
+    }
+
     case FeederEx.parse(body) do
-      {:ok, feed, _} -> {:ok, feed}
+      {:ok, feed, _} -> {:ok, feed, metadata: metadata}
       _ -> :error
     end
   end

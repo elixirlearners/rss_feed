@@ -7,7 +7,7 @@ defmodule RssFeed.Feeds.Feed do
   schema "feeds" do
     field :url, :string
     field :etag, :string
-    field :last_updated, :utc_datetime
+    field :last_modified, :string
 
     timestamps()
   end
@@ -18,5 +18,10 @@ defmodule RssFeed.Feeds.Feed do
     |> cast(attrs, [:url])
     |> validate_required([:url])
     |> unique_constraint(:url)
+  end
+
+  def changeset_update_metadata(feed, attrs) do
+    feed
+    |> cast(attrs, [:etag, :last_modified])
   end
 end

@@ -26,6 +26,9 @@ config :rss_feed, RssFeedWeb.Endpoint,
 # In test we don't send emails.
 config :rss_feed, RssFeed.Mailer, adapter: Swoosh.Adapters.Test
 
+# In test we dont run the real scheduler
+config :rss_feed, :scheduler, RssFeed.FeedFetcher.ScheduledUpdateTest
+
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 

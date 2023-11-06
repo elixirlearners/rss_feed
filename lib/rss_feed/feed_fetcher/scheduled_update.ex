@@ -1,5 +1,9 @@
 defmodule RssFeed.FeedFetcher.ScheduledUpdate do
+  @scheduler Application.get_env(:rss_feed, :scheduler)
+
   use GenServer
+  alias RssFeed.Feeds
+  alias RssFeed.Feeds.Feed
 
   @moduledoc """
   Polling RSS Feed updates policy
@@ -29,7 +33,9 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   def init(state) do
     IO.puts("Starting rss feed scheduler")
 
-    schedule_next_update()
+    @scheduler.run_scheduled_task()
+
+    @scheduler.schedule_next_update()
 
     {:ok, state}
   end
@@ -43,7 +49,12 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
     {:noreply, state}
   end
 
-  def handle_info({:ok, message}, state) do
+  def handle_info({:ok, message, metadata}, state) do
+    # Update feed_content
+
+    # Updated feeds metadata
+    Feeds.update_cache_metadata(%Feed{}, metadata)
+
     IO.inspect(message, label: "Received message")
 
     {:noreply, state}
@@ -55,24 +66,18 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
     {:noreply, state}
   end
 
-  defp schedule_next_update do
+  def schedule_next_update do
     Process.send_after(self(), :update, @interval)
   end
 
-  defp run_scheduled_task do
+  def run_scheduled_task do
     IO.puts("Starting work update")
 
     parent_pid = self()
 
-    feeds = [
-      %{url: "https://rss.art19.com/smartless"},
-      %{url: "https://feeds.megaphone.fm/newheights"},
-      %{url: "https://podcastfeeds.nbcnews.com/RPWEjhKq"},
-      %{url: "https://rss.art19.com/-exposed-"}
-    ]
-
-    Enum.each(feeds, fn feed ->
-      spawn(RssFeed.FeedFetcher.Worker, :run, [feed.url, parent_pid])
+    Feeds.list_all_due_for_update()
+    |> Enum.each(fn feed ->
+      spawn(RssFeed.FeedFetcher.Worker, :run, [feed, parent_pid])
     end)
   end
 end
