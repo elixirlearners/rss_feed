@@ -19,7 +19,7 @@ defmodule RssFeed.Application do
       # Start the Endpoint (http/https)
       RssFeedWeb.Endpoint,
       # Start a worker by calling: RssFeed.Worker.start_link(arg)
-      RssFeed.ScheduledUpdate
+      RssFeed.FeedFetcher.ScheduledUpdate
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

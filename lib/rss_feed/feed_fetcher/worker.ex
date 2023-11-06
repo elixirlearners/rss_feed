@@ -1,8 +1,14 @@
-defmodule RssFeed.Fetcher do
-  def run(url, http_client \\ HTTPoison) do
-    url
-    |> http_client.get()
-    |> parse()
+defmodule RssFeed.FeedFetcher.Worker do
+  def run(url, parent_pid, http_client \\ HTTPoison) do
+    result =
+      url
+      |> http_client.get()
+      |> parse()
+
+    case result do
+      {:ok, feed} -> send(parent_pid, {:ok, feed})
+      _ -> send(parent_pid, {:error, url})
+    end
   end
 
   def parse({:ok, %HTTPoison.Response{body: body, status_code: 200, headers: _headers}}) do

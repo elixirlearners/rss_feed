@@ -1,5 +1,7 @@
-defmodule RssFeed.FetcherTest do
+defmodule RssFeed.FeedFetcher.WorkerTest do
   use ExUnit.Case
+
+  alias RssFeed.FeedFetcher.Worker
 
   defmodule MockHTTPoison do
     def get("http://example.com") do
@@ -74,22 +76,32 @@ defmodule RssFeed.FetcherTest do
   end
 
   test "Receives an xml response" do
-    {:ok, response} = RssFeed.Fetcher.run("http://example.com", MockHTTPoison)
-    assert response.title == "Liftoff News"
-    assert response.summary == "Liftoff to Space Exploration."
-    assert response.link == "http://liftoff.msfc.nasa.gov/"
-    assert length(response.entries) == 4
+    parent_pid = self()
+    Worker.run("http://example.com", parent_pid, MockHTTPoison)
+
+    assert_received {:ok,
+                     %{
+                       title: "Liftoff News",
+                       summary: "Liftoff to Space Exploration.",
+                       link: "http://liftoff.msfc.nasa.gov/"
+                     }}
   end
 
   test "malformed response results in :error" do
-    assert RssFeed.Fetcher.run("http://malformed.com", MockHTTPoison) == :error
+    parent_pid = self()
+    Worker.run("http://malformed.com", parent_pid, MockHTTPoison)
+    assert_received {:error, "http://malformed.com"}
   end
 
   test "404 results in :error" do
-    assert RssFeed.Fetcher.run("http://404.com", MockHTTPoison) == :error
+    parent_pid = self()
+    Worker.run("http://404.com", parent_pid, MockHTTPoison)
+    assert_received {:error, "http://404.com"}
   end
 
   test "Error results in :error" do
-    assert RssFeed.Fetcher.run("http://error.com", MockHTTPoison) == :error
+    parent_pid = self()
+    Worker.run("http://error.com", parent_pid, MockHTTPoison)
+    assert_received {:error, "http://error.com"}
   end
 end

@@ -19,7 +19,7 @@ defmodule RssFeed.MixProject do
   def application do
     [
       mod: {RssFeed.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :wx, :observer]
     ]
   end
 
