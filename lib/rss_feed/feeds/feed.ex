@@ -15,8 +15,8 @@ defmodule RssFeed.Feeds.Feed do
   @doc false
   def changeset(feed, attrs) do
     feed
-    |> cast(attrs, [:url, :etag, :last_updated])
-    |> validate_required([:url, :etag, :last_updated])
+    |> cast(attrs, [:url])
+    |> validate_required([:url])
     |> unique_constraint(:url)
   end
 end

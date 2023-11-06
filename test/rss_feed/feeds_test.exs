@@ -21,12 +21,10 @@ defmodule RssFeed.FeedsTest do
     end
 
     test "create_feed/1 with valid data creates a feed" do
-      valid_attrs = %{url: "some url", etag: "some etag", last_updated: ~U[2023-11-05 10:26:00Z]}
+      valid_attrs = %{url: "some url"}
 
       assert {:ok, %Feed{} = feed} = Feeds.create_feed(valid_attrs)
       assert feed.url == "some url"
-      assert feed.etag == "some etag"
-      assert feed.last_updated == ~U[2023-11-05 10:26:00Z]
     end
 
     test "create_feed/1 with invalid data returns error changeset" do
@@ -35,12 +33,11 @@ defmodule RssFeed.FeedsTest do
 
     test "update_feed/2 with valid data updates the feed" do
       feed = feed_fixture()
-      update_attrs = %{url: "some updated url", etag: "some updated etag", last_updated: ~U[2023-11-06 10:26:00Z]}
+
+      update_attrs = %{url: "some updated url"}
 
       assert {:ok, %Feed{} = feed} = Feeds.update_feed(feed, update_attrs)
       assert feed.url == "some updated url"
-      assert feed.etag == "some updated etag"
-      assert feed.last_updated == ~U[2023-11-06 10:26:00Z]
     end
 
     test "update_feed/2 with invalid data returns error changeset" do

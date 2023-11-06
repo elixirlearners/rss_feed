@@ -20,8 +20,6 @@ defmodule RssFeedWeb.FeedLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:url]} type="text" label="Url" />
-        <.input field={@form[:etag]} type="text" label="Etag" />
-        <.input field={@form[:last_updated]} type="datetime-local" label="Last updated" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Feed</.button>
         </:actions>

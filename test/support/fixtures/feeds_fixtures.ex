@@ -15,11 +15,7 @@ defmodule RssFeed.FeedsFixtures do
   def feed_fixture(attrs \\ %{}) do
     {:ok, feed} =
       attrs
-      |> Enum.into(%{
-        etag: "some etag",
-        last_updated: ~U[2023-11-05 10:26:00Z],
-        url: unique_feed_url()
-      })
+      |> Enum.into(%{url: unique_feed_url()})
       |> RssFeed.Feeds.create_feed()
 
     feed

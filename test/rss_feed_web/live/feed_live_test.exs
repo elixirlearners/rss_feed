@@ -4,9 +4,11 @@ defmodule RssFeedWeb.FeedLiveTest do
   import Phoenix.LiveViewTest
   import RssFeed.FeedsFixtures
 
-  @create_attrs %{url: "some url", etag: "some etag", last_updated: "2023-11-05T10:26:00Z"}
-  @update_attrs %{url: "some updated url", etag: "some updated etag", last_updated: "2023-11-06T10:26:00Z"}
-  @invalid_attrs %{url: nil, etag: nil, last_updated: nil}
+  @create_attrs %{url: "some url"}
+  @update_attrs %{
+    url: "some updated url"
+  }
+  @invalid_attrs %{url: nil}
 
   defp create_feed(_) do
     feed = feed_fixture()
