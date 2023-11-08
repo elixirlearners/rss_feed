@@ -49,13 +49,14 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
     {:noreply, state}
   end
 
-  def handle_info({:ok, message, metadata}, state) do
-    # Update feed_content
+  def handle_info({:ok, feed, content, metadata}, state) do
+    # TODO: Update feed_content
 
     # Updated feeds metadata
-    Feeds.update_cache_metadata(%Feed{}, metadata)
+    IO.inspect(metadata, label: "Received metadata")
+    IO.inspect(content, label: "Received content")
 
-    IO.inspect(message, label: "Received message")
+    Feeds.update_cache_metadata(feed, metadata)
 
     {:noreply, state}
   end

@@ -5,8 +5,6 @@ defmodule RssFeed.Application do
 
   use Application
 
-  @scheduler Application.get_env(:rss_feed, :scheduler)
-
   @impl true
   def start(_type, _args) do
     children = [
@@ -20,6 +18,7 @@ defmodule RssFeed.Application do
       {Finch, name: RssFeed.Finch},
       # Start the Endpoint (http/https)
       RssFeedWeb.Endpoint,
+      # Start feed fetcher scheduler
       RssFeed.FeedFetcher.ScheduledUpdate
     ]
 

@@ -1,28 +1,45 @@
 defmodule RssFeed.FeedFetcher.Worker do
-  def run(%RssFeed.Feeds.Feed{url: url}, parent_pid, http_client \\ HTTPoison) do
+  def run(%RssFeed.Feeds.Feed{} = feed, parent_pid, http_client \\ HTTPoison) do
     result =
-      url
-      |> http_client.get()
+      feed.url
+      |> http_client.get(create_headers(feed))
       |> parse()
 
     case result do
-      {:ok, feed, metadata} -> send(parent_pid, {:ok, feed, metadata})
-      _ -> send(parent_pid, {:error, url})
+      {:ok, content, metadata} -> send(parent_pid, {:ok, feed, content, metadata})
+      _ -> send(parent_pid, {:error, feed.url})
     end
   end
 
-  def parse({:ok, %HTTPoison.Response{body: body, status_code: 200, headers: headers}}) do
-    IO.inspect(headers)
+  def create_headers(feed) do
+    headers = %{}
 
+    if(feed.etag) do
+      headers = Map.put(headers, "If-None-Match", feed.etag)
+    end
+
+    if feed.last_modified do
+      headers = Map.put(headers, "If-Modified-Since", feed.last_modified)
+    end
+
+    headers
+  end
+
+  def extract_headers(headers) do
     enum_headers = Enum.into(headers, %{})
 
-    metadata = %{
+    %{
       etag: enum_headers["ETag"],
       last_modified: enum_headers["Last-Modified"]
     }
+  end
 
+  def parse({:ok, %HTTPoison.Response{body: body, status_code: 200, headers: headers}}) do
+    metadata = extract_headers(headers)
+
+    # Reconsider parsing the body, should probably just save it as a string in db
     case FeederEx.parse(body) do
-      {:ok, feed, _} -> {:ok, feed, metadata: metadata}
+      {:ok, content, _} -> {:ok, content, metadata}
       _ -> :error
     end
   end
@@ -34,7 +51,7 @@ defmodule RssFeed.FeedFetcher.Worker do
     body = ""
 
     case FeederEx.parse(body) do
-      {:ok, feed, _} -> {:ok, feed}
+      {:ok, content, _} -> {:ok, content}
       _ -> :error
     end
   end
