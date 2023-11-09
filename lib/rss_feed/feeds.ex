@@ -38,9 +38,9 @@ defmodule RssFeed.Feeds do
   @doc """
   Updates the cache headers needed for a feed
   """
-  def update_cache_metadata(%Feed{} = feed, attrs \\ %{}) do
+  def update_cache_data(%Feed{} = feed, attrs \\ %{}) do
     feed
-    |> Feed.changeset_update_metadata(attrs)
+    |> Feed.changeset_update_data(attrs)
     # force update timestamp regardless if there is a change or not
     |> Repo.update(force: true)
   end

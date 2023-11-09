@@ -1,9 +1,9 @@
 defmodule RssFeed.FeedFetcher.ScheduledUpdate do
-  @scheduler Application.get_env(:rss_feed, :scheduler)
+  @scheduler Application.compile_env(:rss_feed, :scheduler)
 
   use GenServer
+  require Logger
   alias RssFeed.Feeds
-  alias RssFeed.Feeds.Feed
 
   @moduledoc """
   Polling RSS Feed updates policy
@@ -22,8 +22,8 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   6. At last, do it once a hour
   """
 
-  # twenty minutes
-  @interval 20 * 60 * 1000
+  # 60 minutes
+  @interval 60 * 60 * 1000
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{})
@@ -31,7 +31,7 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
 
   @impl true
   def init(state) do
-    IO.puts("Starting rss feed scheduler")
+    Logger.info("Starting rss feed scheduler")
 
     @scheduler.run_scheduled_task()
 
@@ -49,20 +49,20 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
     {:noreply, state}
   end
 
-  def handle_info({:ok, feed, content, metadata}, state) do
-    # TODO: Update feed_content
+  def handle_info({:ok, feed, nil}, state) do
+    Logger.info("Received no new data for #{feed.url}")
 
-    # Updated feeds metadata
-    IO.inspect(metadata, label: "Received metadata")
-    IO.inspect(content, label: "Received content")
+    {:noreply, state}
+  end
 
-    Feeds.update_cache_metadata(feed, metadata)
+  def handle_info({:ok, feed, data}, state) do
+    Feeds.update_cache_data(feed, Map.from_struct(data))
 
     {:noreply, state}
   end
 
   def handle_info({:error, url}, state) do
-    IO.inspect("Received error for #{url}")
+    Logger.alert("Received error for #{url}")
 
     {:noreply, state}
   end
@@ -72,7 +72,7 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   end
 
   def run_scheduled_task do
-    IO.puts("Starting work update")
+    Logger.info("Starting work update")
 
     parent_pid = self()
 

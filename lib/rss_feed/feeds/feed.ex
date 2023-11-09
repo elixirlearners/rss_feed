@@ -6,9 +6,20 @@ defmodule RssFeed.Feeds.Feed do
   @foreign_key_type :binary_id
   schema "feeds" do
     field :url, :string
+    # Metadata
     field :etag, :string
     field :last_modified, :string
-
+    # Feederex fields
+    field :author, :string
+    field :image, :string
+    field :link, :string
+    field :language, :string
+    field :subtitle, :string
+    field :summary, :string
+    field :title, :string
+    field :updated, :string
+    # Association
+    # has_many :entries, RssFeed.FeedItems.FeedItem
     timestamps()
   end
 
@@ -20,8 +31,21 @@ defmodule RssFeed.Feeds.Feed do
     |> unique_constraint(:url)
   end
 
-  def changeset_update_metadata(feed, attrs) do
+  def changeset_update_data(feed, attrs) do
     feed
-    |> cast(attrs, [:etag, :last_modified])
+    |> cast(attrs, [
+      :etag,
+      :last_modified,
+      :author,
+      :image,
+      :link,
+      :language,
+      :subtitle,
+      :summary,
+      :title,
+      :updated
+    ])
+
+    # |> cast_assoc(:entries, required: false, with: &RssFeed.FeedItems.FeedItem.changeset/2)
   end
 end

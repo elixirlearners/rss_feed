@@ -4,9 +4,18 @@ defmodule RssFeed.Repo.Migrations.CreateFeeds do
   def change do
     create table(:feeds, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :url, :string
+      add :url, :text
       add :etag, :string
       add :last_modified, :string
+      # Feederex fields
+      add :author, :text
+      add :image, :text
+      add :link, :text
+      add :language, :string
+      add :subtitle, :text
+      add :summary, :text
+      add :title, :text
+      add :updated, :string
 
       timestamps()
     end
