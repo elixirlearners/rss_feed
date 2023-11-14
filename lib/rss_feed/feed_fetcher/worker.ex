@@ -2,12 +2,27 @@ defmodule RssFeed.FeedFetcher.Worker do
   def run(%RssFeed.Feeds.Feed{} = feed, parent_pid, http_client \\ HTTPoison) do
     result =
       feed.url
-      |> http_client.get(create_headers(feed))
+      |> http_client.get(make_headers(feed))
       |> parse()
 
     case result do
       {:ok, content, metadata} when content != nil and metadata != nil ->
-        send(parent_pid, {:ok, feed, Map.merge(content, metadata)})
+        map_entries =
+          Enum.map(content.entries, fn entry ->
+            entry
+            |> Map.put_new(:source_id, Map.get(entry, :id))
+            |> Map.put_new(:feed_id, Map.get(feed, :id))
+            |> Map.delete(:id)
+            |> Map.from_struct()
+          end)
+
+        map_data =
+          content
+          |> Map.put(:id, Map.get(feed, :id))
+          |> Map.replace(:entries, map_entries)
+          |> Map.from_struct()
+
+        send(parent_pid, {:ok, feed, Map.merge(map_data, metadata)})
 
       {:ok, _, _} ->
         send(parent_pid, {:ok, feed, nil})
@@ -17,7 +32,7 @@ defmodule RssFeed.FeedFetcher.Worker do
     end
   end
 
-  def create_headers(feed) do
+  def make_headers(feed) do
     headers = %{}
 
     case {Map.get(feed, :etag, nil), Map.get(feed, :last_modified, nil)} do

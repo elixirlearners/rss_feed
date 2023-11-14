@@ -56,7 +56,9 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   end
 
   def handle_info({:ok, feed, data}, state) do
-    Feeds.update_cache_data(feed, Map.from_struct(data))
+    Logger.info("New data for #{feed.url}")
+
+    Feeds.update_cache_data(feed, data)
 
     {:noreply, state}
   end

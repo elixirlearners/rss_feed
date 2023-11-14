@@ -19,7 +19,7 @@ defmodule RssFeed.Feeds.Feed do
     field :title, :string
     field :updated, :string
     # Association
-    # has_many :entries, RssFeed.FeedItems.FeedItem
+    has_many :entries, RssFeed.FeedItems.FeedItem, on_replace: :delete_if_exists
     timestamps()
   end
 
@@ -45,7 +45,6 @@ defmodule RssFeed.Feeds.Feed do
       :title,
       :updated
     ])
-
-    # |> cast_assoc(:entries, required: false, with: &RssFeed.FeedItems.FeedItem.changeset/2)
+    |> cast_assoc(:entries, required: false, with: &RssFeed.FeedItems.FeedItem.changeset/2)
   end
 end

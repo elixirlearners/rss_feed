@@ -9,14 +9,14 @@ defmodule RssFeed.FeedItems.FeedItem do
     field :title, :string
     field :author, :string
     field :image, :string
-    field :categories, :string
+    field :categories, {:array, :float}
     field :duration, :string
     field :enclosure, :string
     field :subtitle, :string
     field :summary, :string
     field :updated, :string
     field :source_id, :string
-    belongs_to :feed, RssFeed.Feeds.Feed, type: :binary_id, on_replace: :delete
+    belongs_to :feed, RssFeed.Feeds.Feed, type: :binary_id, on_replace: :update
 
     timestamps()
   end
@@ -27,9 +27,9 @@ defmodule RssFeed.FeedItems.FeedItem do
     |> cast(attrs, [
       :source_id,
       :author,
-      :categories,
-      :duration,
-      :enclosure,
+      # :categories, # Probably an array
+      # :duration,
+      # :enclosure,
       :image,
       :link,
       :subtitle,
