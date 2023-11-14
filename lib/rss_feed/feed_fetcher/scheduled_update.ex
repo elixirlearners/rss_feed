@@ -1,5 +1,9 @@
 defmodule RssFeed.FeedFetcher.ScheduledUpdate do
+  @scheduler Application.compile_env(:rss_feed, :scheduler)
+
   use GenServer
+  require Logger
+  alias RssFeed.Feeds
 
   @moduledoc """
   Polling RSS Feed updates policy
@@ -18,8 +22,8 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   6. At last, do it once a hour
   """
 
-  # twenty minutes
-  @interval 20 * 60 * 1000
+  # 60 minutes
+  @interval 60 * 60 * 1000
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{})
@@ -27,9 +31,11 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
 
   @impl true
   def init(state) do
-    IO.puts("Starting rss feed scheduler")
+    Logger.info("Starting rss feed scheduler")
 
-    schedule_next_update()
+    @scheduler.run_scheduled_task()
+
+    @scheduler.schedule_next_update()
 
     {:ok, state}
   end
@@ -43,36 +49,38 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
     {:noreply, state}
   end
 
-  def handle_info({:ok, message}, state) do
-    IO.inspect(message, label: "Received message")
+  def handle_info({:ok, feed, nil}, state) do
+    Logger.info("Received no new data for #{feed.url}")
+
+    {:noreply, state}
+  end
+
+  def handle_info({:ok, feed, data}, state) do
+    Logger.info("New data for #{feed.url}")
+
+    Feeds.update_cache_data(feed, data)
 
     {:noreply, state}
   end
 
   def handle_info({:error, url}, state) do
-    IO.inspect("Received error for #{url}")
+    Logger.alert("Received error for #{url}")
 
     {:noreply, state}
   end
 
-  defp schedule_next_update do
+  def schedule_next_update do
     Process.send_after(self(), :update, @interval)
   end
 
-  defp run_scheduled_task do
-    IO.puts("Starting work update")
+  def run_scheduled_task do
+    Logger.info("Starting work update")
 
     parent_pid = self()
 
-    feeds = [
-      %{url: "https://rss.art19.com/smartless"},
-      %{url: "https://feeds.megaphone.fm/newheights"},
-      %{url: "https://podcastfeeds.nbcnews.com/RPWEjhKq"},
-      %{url: "https://rss.art19.com/-exposed-"}
-    ]
-
-    Enum.each(feeds, fn feed ->
-      spawn(RssFeed.FeedFetcher.Worker, :run, [feed.url, parent_pid])
+    Feeds.list_all_due_for_update()
+    |> Enum.each(fn feed ->
+      spawn(RssFeed.FeedFetcher.Worker, :run, [feed, parent_pid])
     end)
   end
 end

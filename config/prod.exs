@@ -7,6 +7,9 @@ import Config
 # before starting your production server.
 config :rss_feed, RssFeedWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+# In test we dont run the real scheduler
+config :rss_feed, :scheduler, RssFeed.FeedFetcher.ScheduledUpdate
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: RssFeed.Finch
 

@@ -18,7 +18,7 @@ defmodule RssFeed.Application do
       {Finch, name: RssFeed.Finch},
       # Start the Endpoint (http/https)
       RssFeedWeb.Endpoint,
-      # Start a worker by calling: RssFeed.Worker.start_link(arg)
+      # Start feed fetcher scheduler
       RssFeed.FeedFetcher.ScheduledUpdate
     ]
 
