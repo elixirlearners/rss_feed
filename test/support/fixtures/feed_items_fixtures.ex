@@ -20,7 +20,8 @@ defmodule RssFeed.FeedItemsFixtures do
         subtitle: "some subtitle",
         summary: "some summary",
         title: "some title",
-        updated: "some updated"
+        updated: "some updated",
+        source_id: "some source_id"
       })
       |> RssFeed.FeedItems.create_feed_item()
 

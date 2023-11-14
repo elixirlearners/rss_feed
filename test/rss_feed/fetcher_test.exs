@@ -1,6 +1,8 @@
 defmodule RssFeed.FeedFetcher.WorkerTest do
   use ExUnit.Case
+  use RssFeedWeb.ConnCase
   alias RssFeed.FeedFetcher.Worker
+  import RssFeed.FeedsFixtures
 
   defmodule MockHTTPoison do
     @rss_response """
@@ -52,18 +54,21 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
     </rss>
     """
 
-
-
-    def get("http://example.com") do
+    def get("http://example.com", _headers) do
       {:ok, %HTTPoison.Response{body: @rss_response, status_code: 200}}
     end
 
-    def get("http://example.com/with_headers") do
-      headers = [{"Content-Type": "application/xml"}, {"ETag": "W123"}, {"Last-Modified": "Tue, 10 Jun 2003 04:00:00 GMT"}]
-      {:ok, %HTTPoison.Response{body: @rss_response, status_code: 200, headers: headers}}
+    def get("http://example.com/with_headers", _headers) do
+      headers = [
+        "Content-Type": "application/xml",
+        ETag: "W123",
+        "Last-Modified": "Tue, 10 Jun 2003 04:00:00 GMT"
+      ]
+
+      {:ok, %HTTPoison.Response{body: @rss_response, status_code: 304, headers: headers}}
     end
 
-    def get("http://malformed.com") do
+    def get("http://malformed.com", _) do
       rss_response = """
       <?xml version="1.0"?>
       <xml malformed />
@@ -72,11 +77,11 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
       {:ok, %HTTPoison.Response{body: rss_response, status_code: 200}}
     end
 
-    def get("http://404.com") do
+    def get("http://404.com", _) do
       {:ok, %HTTPoison.Response{body: "Not found", status_code: 404}}
     end
 
-    def get("http://error.com") do
+    def get("http://error.com", _) do
       {:error, %HTTPoison.Error{reason: "some error"}}
     end
   end
@@ -86,9 +91,11 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
   end
 
   test "Receives an xml response", context do
-    Worker.run("http://example.com", context[:parent_pid], MockHTTPoison)
+    feed = feed_fixture()
 
-    assert_received {:ok,
+    Worker.run(%{feed | url: "http://example.com"}, context[:parent_pid], MockHTTPoison)
+
+    assert_received {:ok, _,
                      %{
                        title: "Liftoff News",
                        summary: "Liftoff to Space Exploration.",
@@ -97,23 +104,36 @@ defmodule RssFeed.FeedFetcher.WorkerTest do
   end
 
   test "Receives etag and last-modified headers", context do
-    Worker.run("http://example.com/with_headers", context[:parent_pid], MockHTTPoison)
+    feed = feed_fixture()
 
-    assert_received {:ok, %{title: "Liftoff News",},  }
+    Worker.run(
+      %{feed | url: "http://example.com/with_headers"},
+      context[:parent_pid],
+      MockHTTPoison
+    )
+
+    assert_received {:ok, _, nil}
   end
 
   test "malformed response results in :error", context do
-    Worker.run("http://malformed.com", context[:parent_pid], MockHTTPoison)
+    feed = feed_fixture()
+
+    Worker.run(%{feed | url: "http://malformed.com"}, context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://malformed.com"}
   end
 
+  @tag capture_log: true
   test "404 results in :error", context do
-    Worker.run("http://404.com", context[:parent_pid], MockHTTPoison)
+    feed = feed_fixture()
+
+    Worker.run(%{feed | url: "http://404.com"}, context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://404.com"}
   end
 
+  @tag capture_log: true
   test "Error results in :error", context do
-    Worker.run("http://error.com", context[:parent_pid], MockHTTPoison)
+    feed = feed_fixture()
+    Worker.run(%{feed | url: "http://error.com"}, context[:parent_pid], MockHTTPoison)
     assert_received {:error, "http://error.com"}
   end
 end

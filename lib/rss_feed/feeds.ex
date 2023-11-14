@@ -21,7 +21,6 @@ defmodule RssFeed.Feeds do
   """
   def list_feeds do
     Repo.all(Feed)
-    |> Repo.preload(:entries)
   end
 
   def list_all_due_for_update do

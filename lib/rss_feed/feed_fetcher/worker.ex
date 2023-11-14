@@ -1,4 +1,6 @@
 defmodule RssFeed.FeedFetcher.Worker do
+  require Logger
+
   def run(%RssFeed.Feeds.Feed{} = feed, parent_pid, http_client \\ HTTPoison) do
     result =
       feed.url
@@ -76,7 +78,7 @@ defmodule RssFeed.FeedFetcher.Worker do
   end
 
   def parse(err) do
-    IO.inspect(err, label: "error")
+    Logger.alert("RSSFeed.FeedFetcher.Worker Error: #{inspect(err)}")
     :error
   end
 end

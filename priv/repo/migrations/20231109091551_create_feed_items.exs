@@ -2,7 +2,8 @@ defmodule RssFeed.Repo.Migrations.CreateFeedItems do
   use Ecto.Migration
 
   def change do
-    create table(:feed_entries, primary_key: false) do
+    # TODO: Rename to feed_entries
+    create table(:feed_items, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :source_id, :text
       add :author, :text
@@ -20,6 +21,6 @@ defmodule RssFeed.Repo.Migrations.CreateFeedItems do
       timestamps()
     end
 
-    create index(:feed_entries, [:feed_id])
+    create index(:feed_items, [:feed_id])
   end
 end

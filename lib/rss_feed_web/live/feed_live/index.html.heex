@@ -14,7 +14,7 @@
 >
   <:col :let={{_id, feed}} label="Url"><%= feed.url %></:col>
   <:col :let={{_id, feed}} label="Etag"><%= feed.etag %></:col>
-  <:col :let={{_id, feed}} label="Last updated"><%= feed.last_modified %></:col>
+  <:col :let={{_id, feed}} label="Last Modified"><%= feed.last_modified %></:col>
   <:action :let={{_id, feed}}>
     <div class="sr-only">
       <.link navigate={~p"/feeds/#{feed}"}>Show</.link>
