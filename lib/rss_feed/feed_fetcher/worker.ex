@@ -2,10 +2,14 @@ defmodule RssFeed.FeedFetcher.Worker do
   require Logger
 
   def run(%RssFeed.Feeds.Feed{} = feed, parent_pid, http_client \\ HTTPoison) do
+    IO.inspect(feed.url, label: "FEED")
+
     result =
       feed.url
       |> http_client.get(make_headers(feed))
       |> parse()
+
+    IO.inspect(result, label: "RESULT")
 
     case result do
       {:ok, content, metadata} when content != nil and metadata != nil ->

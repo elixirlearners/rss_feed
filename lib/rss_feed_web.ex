@@ -87,6 +87,9 @@ defmodule RssFeedWeb do
       import RssFeedWeb.CoreComponents
       import RssFeedWeb.Gettext
 
+      # Custom components
+      import RssFeedWeb.Components.Layout
+
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 

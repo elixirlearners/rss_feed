@@ -42,9 +42,9 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
 
   @impl true
   def handle_info(:update, state) do
-    run_scheduled_task()
+    @scheduler.run_scheduled_task()
 
-    schedule_next_update()
+    @scheduler.schedule_next_update()
 
     {:noreply, state}
   end
