@@ -6,7 +6,7 @@ defmodule RssFeedWeb.Components.Layout do
 
   def app_header(assigns) do
     ~H"""
-    <nav class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
+    <nav class="bg-gray-100 border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
       <div class="flex flex-wrap justify-between items-center">
         <div class="flex justify-start items-center">
           <%= render_slot(@left) %>
@@ -23,7 +23,7 @@ defmodule RssFeedWeb.Components.Layout do
 
   def main_content(assigns) do
     ~H"""
-    <main class="p-4 md:ml-64 h-auto pt-20">
+    <main class="md:ml-72 h-auto">
       <%= render_slot(@inner_block) %>
     </main>
     """
@@ -35,11 +35,11 @@ defmodule RssFeedWeb.Components.Layout do
   def sidebar_drawer(assigns) do
     ~H"""
     <aside
-      class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+      class="fixed top-0 left-0 z-40 w-72 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 lg:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
       aria-label="Sidenav"
       id={@id}
     >
-      <div class="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
+      <div class="overflow-y-auto py-5 px-3 h-full bg-gray-100 dark:bg-gray-800">
         <%= render_slot(@inner_block) %>
       </div>
     </aside>
@@ -54,7 +54,7 @@ defmodule RssFeedWeb.Components.Layout do
       data-drawer-target={@target_id}
       data-drawer-toggle={@target_id}
       aria-controls={@target_id}
-      class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer md:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+      class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
     >
       <svg
         aria-hidden="true"
@@ -86,6 +86,23 @@ defmodule RssFeedWeb.Components.Layout do
       </svg>
       <span class="sr-only">Toggle sidebar</span>
     </button>
+    """
+  end
+
+  slot :inner_block, required: true
+  attr :id, :string, default: "feed_sidebar"
+
+  def feed_sidebar(assigns) do
+    ~H"""
+    <aside
+      class="fixed z-38 w-1/4 h-screen pt-14 transition-transform -translate-x-full bg-gray-50 border-r border-gray-200 lg:translate-x-0 dark:bg-gray-900 dark:border-gray-800"
+      aria-label="Feedlist"
+      id={@id}
+    >
+      <div class="overflow-y-auto py-5 px-3 h-full">
+        <%= render_slot(@inner_block) %>
+      </div>
+    </aside>
     """
   end
 end

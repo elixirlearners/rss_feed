@@ -1,4 +1,5 @@
 defmodule RssFeed.Feeds.Feed do
+  alias RssFeed.SanitizeHTML
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -32,6 +33,8 @@ defmodule RssFeed.Feeds.Feed do
   end
 
   def changeset_update_data(feed, attrs) do
+    attrs = SanitizeHTML.sanitize_attrs(attrs)
+
     feed
     |> cast(attrs, [
       :etag,

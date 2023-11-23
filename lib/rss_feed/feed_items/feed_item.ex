@@ -1,4 +1,5 @@
 defmodule RssFeed.FeedItems.FeedItem do
+  alias RssFeed.SanitizeHTML
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,7 +10,7 @@ defmodule RssFeed.FeedItems.FeedItem do
     field :title, :string
     field :author, :string
     field :image, :string
-    field :categories, {:array, :float}
+    field :categories, {:array, :string}
     field :duration, :string
     field :enclosure, :string
     field :subtitle, :string
@@ -23,6 +24,8 @@ defmodule RssFeed.FeedItems.FeedItem do
 
   @doc false
   def changeset(feed_item, attrs) do
+    attrs = SanitizeHTML.sanitize_attrs(attrs)
+
     feed_item
     |> cast(attrs, [
       :source_id,

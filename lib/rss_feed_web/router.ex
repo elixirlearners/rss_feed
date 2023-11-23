@@ -26,8 +26,8 @@ defmodule RssFeedWeb.Router do
     live "/feeds/new", FeedLive.Index, :new
     live "/feeds/:id/edit", FeedLive.Index, :edit
 
-    live "/feeds/:id", FeedLive.Show, :show
-    live "/feeds/:id/show/edit", FeedLive.Show, :edit
+    live "/feeds/:id", FeedLive.Show, :index
+    live "/feeds/:id/:entry_id", FeedLive.Show, :entry
   end
 
   # Other scopes may use custom stacks.
