@@ -17,6 +17,7 @@ defmodule RssFeed.FeedItems.FeedItem do
     field :summary, :string
     field :updated, :string
     field :source_id, :string
+    # :on_replace - The action taken on associations when the record is replaced
     belongs_to :feed, RssFeed.Feeds.Feed, type: :binary_id, on_replace: :update
 
     timestamps()
@@ -40,10 +41,10 @@ defmodule RssFeed.FeedItems.FeedItem do
       :title,
       :updated
     ])
-    |> validate_required([
-      :source_id,
-      :title
-    ])
+    # |> validate_required([
+    #   :source_id,
+    #   :title
+    # ])
     |> unique_constraint(:source_id)
   end
 end

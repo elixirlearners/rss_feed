@@ -29,6 +29,9 @@ defmodule RssFeed.FeedFetcher.Worker do
       {:ok, _, _} ->
         send(parent_pid, {:ok, feed, nil})
 
+      {:error, %{location: location}} ->
+        send(parent_pid, {:error, %{location: location, feed: feed}})
+
       _ ->
         send(parent_pid, {:error, feed.url})
     end
@@ -67,7 +70,7 @@ defmodule RssFeed.FeedFetcher.Worker do
     # Reconsider parsing the body, should probably just save it as a string in db
     case FeederEx.parse(body) do
       {:ok, content, _} -> {:ok, content, metadata}
-      _ -> :error
+      _ -> {:error, nil}
     end
   end
 
@@ -77,8 +80,14 @@ defmodule RssFeed.FeedFetcher.Worker do
     {:ok, nil, nil}
   end
 
+  def parse({:ok, %HTTPoison.Response{status_code: 302, headers: headers}}) do
+    enum_headers = Enum.into(headers, %{})
+
+    {:error, %{location: enum_headers["Location"]}}
+  end
+
   def parse(err) do
     Logger.alert("RSSFeed.FeedFetcher.Worker Error: #{inspect(err)}")
-    :error
+    {:error, nil}
   end
 end

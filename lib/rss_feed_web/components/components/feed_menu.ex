@@ -18,10 +18,12 @@ defmodule RssFeedWeb.Components.SideMenu do
         <.link
           title={item.title}
           navigate={item.link}
-          class="flex items-center p-2 text-sm font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+          class="flex items-center gap-3 p-2 text-sm font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
         >
-          <img src={item.image} class="w-9 h-9 mr-2 rounded" />
-          <span class="ml-1 truncate"><%= render_slot(item) %></span>
+          <div class="flex shrink-0 items-center h-9 w-9">
+            <img src={item.image} class="rounded" />
+          </div>
+          <span class="truncate"><%= render_slot(item) %></span>
         </.link>
       </li>
     </ul>

@@ -100,7 +100,8 @@ defmodule RssFeed.Feeds do
   def update_feed(%Feed{} = feed, attrs) do
     feed
     |> Feed.changeset(attrs)
-    |> Repo.update()
+    # force update timestamp regardless if there is a change or not
+    |> Repo.update(force: true)
   end
 
   @doc """

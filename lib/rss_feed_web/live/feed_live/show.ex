@@ -17,7 +17,10 @@ defmodule RssFeedWeb.FeedLive.Show do
 
     {:noreply,
      socket
-     |> assign(:page_title, page_title(socket.assigns.live_action, feed))
+     |> assign(
+       :page_title,
+       page_title(socket.assigns.live_action, feed.title <> " - " <> entry.title)
+     )
      |> assign(:feed, feed)
      |> assign(:entry, entry)}
   end
@@ -33,5 +36,5 @@ defmodule RssFeedWeb.FeedLive.Show do
   end
 
   defp page_title(:index, %{title: title}), do: title
-  defp page_title(:entry, _), do: "Edit Feed"
+  defp page_title(:entry, title), do: title
 end

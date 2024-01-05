@@ -95,11 +95,11 @@ defmodule RssFeedWeb.Components.Layout do
   def feed_sidebar(assigns) do
     ~H"""
     <aside
-      class="fixed z-38 w-1/4 h-screen pt-14 transition-transform -translate-x-full bg-gray-50 border-r border-gray-200 lg:translate-x-0 dark:bg-gray-900 dark:border-gray-800"
+      class="fixed top z-38 w-72 xl:w-96 h-screen pt-16 transition-transform -translate-x-full lg:translate-x-0 bg-gray-50 border-r border-gray-200 dark:bg-gray-900 dark:border-gray-800"
       aria-label="Feedlist"
       id={@id}
     >
-      <div class="overflow-y-auto py-5 px-3 h-full">
+      <div class="overflow-y-auto p-3 h-full">
         <%= render_slot(@inner_block) %>
       </div>
     </aside>

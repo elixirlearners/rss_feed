@@ -26,10 +26,27 @@ defmodule RssFeed.Feeds.Feed do
 
   @doc false
   def changeset(feed, attrs) do
+    # feed
+    # |> cast(attrs, [:url])
+    # |> validate_required([:url])
+    # |> unique_constraint(:url)
+
+    attrs = SanitizeHTML.sanitize_attrs(attrs)
+
     feed
-    |> cast(attrs, [:url])
-    |> validate_required([:url])
-    |> unique_constraint(:url)
+    |> cast(attrs, [
+      :url,
+      :etag,
+      :last_modified,
+      :author,
+      :image,
+      :link,
+      :language,
+      :subtitle,
+      :summary,
+      :title,
+      :updated
+    ])
   end
 
   def changeset_update_data(feed, attrs) do
@@ -37,6 +54,7 @@ defmodule RssFeed.Feeds.Feed do
 
     feed
     |> cast(attrs, [
+      :url,
       :etag,
       :last_modified,
       :author,

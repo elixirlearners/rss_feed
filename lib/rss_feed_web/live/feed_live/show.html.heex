@@ -1,9 +1,10 @@
 <div class="flex h-full">
   <.feed_sidebar>
-    <ul class="pt-2 space-y-1">
+    <ul class="space-y-1">
       <li :for={entry <- @feed.entries}>
         <.link
           navigate={~p"/feeds/#{@feed.id}/#{entry.id}"}
+          title={entry.title}
           class="flex items-center p-2 text-base rounded-lg transition duration-75 text-gray-700 hover:text-blue-700 hover:bg-gray-200 dark:hover:text-blue-500 dark:hover:bg-gray-800 dark:text-gray-400 group"
         >
           <span class="truncate">
@@ -16,17 +17,18 @@
       </li>
     </ul>
   </.feed_sidebar>
-  <div class=" pt-16 xl:mx-auto">
+  <!-- spacer for sidebar -->
+  <div class="xl:w-96 lg:w-72 w-0 lg:p-3 shrink-0" />
+  <div class="pt-16 xl:max-w-4xl">
     <article
       :if={@live_action == :entry}
-      class="text-gray-900 dark:text-white
-       lg:ml-80 px-14 py-6 w-full md:max-w-xl xl:max-w-3xl"
+      class="text-gray-900 dark:text-white px-14 md:px-8 xl:px-14 py-6"
     >
       <header>
         <address class="flex items-center mb-6 not-italic">
           <div class="inline-flex items-center mr-3 text-sm">
             <img
-              class="mr-4 w-32 h-32 rounded"
+              class="mr-4 w-32 rounded"
               src={Imagehelper.select(@entry.image, @feed.image, ~p"/images/empty_image.svg")}
               alt={@feed.title}
             />
@@ -45,14 +47,14 @@
             </div>
           </div>
         </address>
-        <h1 class="mb-4 text-2xl font-extrabold leading-tight  lg:mb-6 lg:text-3xl ">
+        <h1 class="mb-4 text-2xl font-extrabold leading-tight lg:mb-6 lg:text-3xl ">
           <%= @entry.title %>
         </h1>
       </header>
       <div class="format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
         <%= @entry.summary |> raw() %>
       </div>
-      <a href={@entry.link} target="_blank">
+      <a href={@entry.link} target="_blank" title={@entry.title}>
         Read More <.icon name="hero-arrow-top-right-on-square" />
       </a>
     </article>
@@ -61,11 +63,11 @@
       <.header>
         Feed <%= @feed.id %>
         <:subtitle>This is a feed record from your database.</:subtitle>
-        <:actions>
+        <%!-- <:actions>
           <.link patch={~p"/feeds/#{@feed}/show/edit"} phx-click={JS.push_focus()}>
             <.button>Edit feed</.button>
           </.link>
-        </:actions>
+        </:actions> --%>
       </.header>
 
       <.list>

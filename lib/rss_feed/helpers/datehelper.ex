@@ -1,5 +1,6 @@
 defmodule RssFeed.Datehelper do
   def parse(datestr) do
+    # cond
     case DateTime.from_iso8601(datestr) do
       {:ok, date, _} -> to_human(date)
       _ -> datestr
