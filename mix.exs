@@ -52,7 +52,8 @@ defmodule RssFeed.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:httpoison, "~> 2.0"},
-      {:feeder_ex, "~> 1.1"}
+      {:feeder_ex, "~> 1.1"},
+      {:html_sanitize_ex, "~> 1.4"}
     ]
   end
 

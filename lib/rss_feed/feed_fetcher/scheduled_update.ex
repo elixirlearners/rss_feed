@@ -3,6 +3,7 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
 
   use GenServer
   require Logger
+  alias RssFeed.FeedItems
   alias RssFeed.Feeds
 
   @moduledoc """
@@ -42,9 +43,9 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
 
   @impl true
   def handle_info(:update, state) do
-    run_scheduled_task()
+    @scheduler.run_scheduled_task()
 
-    schedule_next_update()
+    @scheduler.schedule_next_update()
 
     {:noreply, state}
   end
@@ -58,7 +59,26 @@ defmodule RssFeed.FeedFetcher.ScheduledUpdate do
   def handle_info({:ok, feed, data}, state) do
     Logger.info("New data for #{feed.url}")
 
-    Feeds.update_cache_data(feed, data)
+    # TODO: Turn the loop into a transaction. Currently making N insertions
+    with {:ok, feed_struct} <- Feeds.update_feed(feed, data),
+         feed_entries <- FeedItems.build_feed_item_associations(feed_struct, data.entries) do
+      Enum.each(feed_entries, fn entry -> FeedItems.upsert_feed_item(entry) end)
+    else
+      {:error, msg} -> Logger.error(msg)
+    end
+
+    {:noreply, state}
+  end
+
+  def handle_info({:error, %{location: url, feed: feed}}, state) do
+    Logger.alert("Received new location: #{url}}")
+
+    {:ok, updated_feed} = Feeds.update_feed(feed, %{url: url})
+    IO.inspect(updated_feed)
+
+    parent_pid = self()
+
+    spawn(RssFeed.FeedFetcher.Worker, :run, [updated_feed, parent_pid])
 
     {:noreply, state}
   end

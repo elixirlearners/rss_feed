@@ -4,6 +4,7 @@ defmodule RssFeed.Feeds do
   """
 
   import Ecto.Query, warn: false
+  alias RssFeed.FeedItems.FeedItem
   alias RssFeed.Repo
   alias RssFeed.Feeds.Feed
 
@@ -60,7 +61,11 @@ defmodule RssFeed.Feeds do
       ** (Ecto.NoResultsError)
 
   """
-  def get_feed!(id), do: Repo.get!(Feed, id)
+
+  def get_feed!(id) do
+    entries_query = from fi in FeedItem, order_by: fi.updated
+    Feed |> Repo.get!(id) |> Repo.preload(entries: entries_query)
+  end
 
   @doc """
   Creates a feed.
@@ -95,7 +100,8 @@ defmodule RssFeed.Feeds do
   def update_feed(%Feed{} = feed, attrs) do
     feed
     |> Feed.changeset(attrs)
-    |> Repo.update()
+    # force update timestamp regardless if there is a change or not
+    |> Repo.update(force: true)
   end
 
   @doc """

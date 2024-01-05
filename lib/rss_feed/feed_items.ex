@@ -55,6 +55,28 @@ defmodule RssFeed.FeedItems do
     |> Repo.insert()
   end
 
+  def upsert_feed_item(%FeedItem{} = feed_item) do
+    feed_item
+    |> Repo.insert(
+      on_conflict: {:replace_all_except, [:id]},
+      conflict_target: [:source_id]
+    )
+  end
+
+  def build_feed_item_associations(feed_struct, entries) do
+    if entries do
+      entries
+      |> Enum.map(fn entry ->
+        Ecto.build_assoc(
+          feed_struct,
+          :entries,
+          # Remove attrs temporarily, only
+          Map.drop(entry, [:enclosure, :duration, :categories])
+        )
+      end)
+    end
+  end
+
   @doc """
   Updates a feed_item.
 
